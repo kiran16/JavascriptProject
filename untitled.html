@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Geolocation</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+       #dvMap {
+        height: 100%;
+      }
+      </style>
+  </head>
+  <body>
+<div id="dvMap"></div>
+<script type="text/javascript">
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function (p) {
+        var LatLng = new google.maps.LatLng(p.coords.latitude, p.coords.longitude);
+        var mapOptions = {
+            center: LatLng,
+            zoom: 13,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        var map = new google.maps.Map(document.getElementById("dvMap"), mapOptions);
+        var marker = new google.maps.Marker({
+            position: LatLng,
+            map: map,
+            title: "<div style = 'height:60px;width:200px'><b>Your location:</b><br />Latitude: " + p.coords.latitude + "<br />Longitude: " + p.coords.longitude
+        });
+        google.maps.event.addListener(marker, "click", function (e) {
+            var infoWindow = new google.maps.InfoWindow();
+            infoWindow.setContent(marker.title);
+            infoWindow.open(map, marker);
+        });
+    });
+} else {
+    alert('Geo Location feature is not supported in this browser.');
+}
+</script>
+
+ <script async defer src="http://maps.googleapis.com/maps/api/js?key=AIzaSyAg8hlcEgMPWjZtM4xWgHeDgIvmdmhQu2A"></script>
+
+<div>
+     <h3> Enter an address and press the button</h3>
+
+    <input id="address" type="text" placeholder="Enter address here" />
+    <button id="btn">Get LatLong</button>
+    <div>
+        <p>Latitude:
+            <input type="text" id="latitude" readonly />
+        </p>
+        <p>Longitude:
+            <input type="text" id="longitude" readonly />
+        </p>
+    </div>
+</div>
+
+<!-- javascript for passing the address and retriving the latitude and longitude values -->
+<script type="text/javascript">
+function showResult(result) {
+    document.getElementById('latitude').value = result.geometry.location.lat();
+    document.getElementById('longitude').value = result.geometry.location.lng();
+}
+
+function getLatitudeLongitude(callback, address) {
+    
+    address = address;
+    // Initialize the Geocoder
+    geocoder = new google.maps.Geocoder();
+    if (geocoder) {
+        geocoder.geocode({
+            'address': address
+        }, function (results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+                callback(results[0]);
+            }
+        });
+    }
+}
+
+var button = document.getElementById('btn');
+
+button.addEventListener("click", function () {
+    var address = document.getElementById('address').value;
+    getLatitudeLongitude(showResult, address)
+});
+</script>
+</body>
+</html>
